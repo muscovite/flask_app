@@ -1,31 +1,34 @@
-from flask import Flask, render_template
-app = Flask(__name__)
+import os
+from flask import Flask
+from routes import routes
+from . import db
 
-@app.route("/")
-def index():
-    return "Hello World!"
+def create_app():
+    # create and configure the app
+    app = Flask(__name__)
+    app.register_blueprint(routes)
+    app.instance_path = './instance'
+    db.init_app(app)
+    app.config.from_mapping(
+        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+    )
 
-@app.route("/greet/")
-@app.route("/greet/<name>/")
-def greet(name=None):
-    return render_template("greet.html", name=name)
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
 
-@app.route("/count/<int:number>/")
-def count(number):
-    return "num %d" % number
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         return do_the_login()
-#     else:
-#         return show_the_login_form()
+    return app
 
 # Install
 # pip install flask
 
 # Running app
 # FLASK_APP=main.py FLASK_DEBUG=1 flask run
+
+# Init the db
+# FLASK_APP=main.py FLASK_DEBUG=1 flask init-db
 
 # Other params
 # --port 1234 (default: 5000)
