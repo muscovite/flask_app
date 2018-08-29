@@ -1,35 +1,32 @@
 import os
 from flask import Flask
-from routes import routes
-from . import db
+from flask_app import routes
+from flask_app import db
 
+# Entry point for Flask apps. Mostly contains some boilerplate code needed to
+# get the app up and running
 def create_app():
-    # create and configure the app
+    # Create the app
     app = Flask(__name__)
-    app.register_blueprint(routes)
-    app.instance_path = './instance'
+
+    # If you want to use sessions, you need to set a secret key
+    # This app uses session variables to pass around form validation messages
+    app.secret_key = 'super secure key'
     db.init_app(app)
+
+    # Register routes with your app
+    app.register_blueprint(routes.routes)
+
+    # Tell app where the database instance should live
+    app.instance_path = './instance'
     app.config.from_mapping(
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
 
-    # ensure the instance folder exists
+    # Ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
 
     return app
-
-# Install
-# pip install flask
-
-# Running app
-# FLASK_APP=main.py FLASK_DEBUG=1 flask run
-
-# Init the db
-# FLASK_APP=main.py FLASK_DEBUG=1 flask init-db
-
-# Other params
-# --port 1234 (default: 5000)
-# --host=0.0.0.0

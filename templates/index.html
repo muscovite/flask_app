@@ -1,9 +1,64 @@
 {% extends "base.html" %}
-{% block head %}
-<title>Hello from Flask</title>
-{% endblock %}
-{% if name %}
-  <h1>Hello {{ name }}!</h1>
-{% else %}
-  <h1>Hello, World!</h1>
+{% block browser_title %} Home {% endblock %}
+{% block page_title %} Home {% endblock %}
+{% block content %}
+    <p>Welcome to the COMP 182 gradebook.</p>
+
+<h3>View Student</h3>
+<form action = "{{ url_for('routes.student') }}" method="GET">
+    <p>{{ view_student_form.students }}</p>
+    <p>{{ view_student_form.submit }}</p>
+</form>
+
+<h3>Add Student</h3>
+<h4>Current students</h4>
+{% if students %}
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
+    {% for row in students %}
+        <tr>
+          <td>{{ row[0] }}</td>
+          <td>{{ row[1] }}</td>
+        </tr>
+    {% endfor %}    
+</table>
 {% endif %}
+<h4>Add new student</h4>
+<form action="{{ url_for('routes.add_student') }}" method="POST">
+    {{ render_success("add_student") }}
+    {{ render_errors("add_student") }}
+    <p>Name: {{ add_student_form.name }}</p>
+    <p>{{ add_student_form.submit }}</p>
+</form>
+
+<h3>Add Assignment</h3>
+<h4>Current assignments</h4>
+{% if assignments %}
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Weight</th>
+        <th>Due Date</th>
+    </tr>
+    {% for row in assignments %}
+        <tr>
+          <td>{{ row[1] }}</td>
+          <td>{{ row[2] }}</td>
+          <td>{{ row[3] }}</td>
+        </tr>
+    {% endfor %}    
+</table>
+{% endif %}
+<h4>Add new assignment</h4>
+<form action="{{ url_for('routes.add_assignment') }}" method="POST">
+    {{ render_success("add_assignment") }}
+    {{ render_errors("add_assignment") }}
+    <p>Title: {{ add_assignment_form.title }}</p>
+    <p>Weight: {{ add_assignment_form.weight }}</p>
+    <p>Due: {{ add_assignment_form.due_date }}</p>
+    <p>{{ add_assignment_form.submit }}</p>
+</form>
+{% endblock %}

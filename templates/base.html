@@ -1,16 +1,42 @@
+{% macro render_errors(form_name) %}
+    {% if error and error[form_name] %}
+        {% set error = error[form_name] %}
+        <div class="error">
+        <p>Error submitting form</p>
+            <ul>
+                {% for field, errors in error.iteritems() %}
+                    <li class="error">{{ field }}:
+                        <ul>
+                        {% for error in errors %}
+                            <li>{{ error }}</li> 
+                        {%endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+    {% endif %}
+{% endmacro %}
+{% macro render_success(form_name) %}
+    {% if success and success[form_name] %}
+        <p class="success">{{ success[form_name] }}</p>
+    {% endif %}
+{% endmacro %}
 <!doctype html>
 <html>
   <head>
-    {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>{% block title %}{% endblock %} - My Webpage</title>
-    {% endblock %}
+    <title>
+      {% block browser_title %}{% endblock %}- COMP 182 Algorithmic Thinking
+    </title>
   </head>
   <body>
+    <h1>{% block page_title %}{% endblock %}</h1>
     <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">
       {% block footer %}
-      &copy; Copyright 2010 by <a href="http://domain.invalid/">you</a>.
+      &copy; Copyright 2018 by <a href="http://domain.invalid/">you</a>.
       {% endblock %}
     </div>
   </body>

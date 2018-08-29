@@ -1,4 +1,10 @@
+#
+# Contains methods for querying and setting up the database
+#
+
 import sqlite3
+import time
+from datetime import datetime
 
 import click
 from flask import current_app, g
@@ -15,7 +21,6 @@ def get_db():
 
     return g.db
 
-
 def close_db(e=None):
     db = g.pop('db', None)
 
@@ -27,7 +32,6 @@ def init_db():
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
-
 
 @click.command('init-db')
 @with_appcontext
@@ -42,31 +46,41 @@ def init_app(app):
 
 # Database interaction
 
-# Return assignment information for a single student
+# Return grade information for a single student
 def get_student(student_id):
-    pass
+    db = get_db()
+    students = db.execute('SELECT * from student').fetchall()
+    return students
 
-# Return assignment information for all students
+# Return all existing students
 def get_students():
-    pass
+    db = get_db()
+    students = db.execute('SELECT * from student').fetchall()
+    return students
+
+# Return all existing assignments
+def get_assignments():
+    db = get_db()
+    assignments = db.execute('SELECT * from assignment').fetchall()
+    return assignments
+
+# Add a new assignment
+def add_assignment(title, weight, due_date):
+    db = get_db()
+    query = """INSERT INTO assignment (title, weight, due_date) 
+               VALUES (?, ?, ?)"""
+    db.execute(query, [title, weight, due_date])
+    db.commit()
 
 # Add a new student to the class
-def create_student(name):
-    pass
+def add_student(name):
+    db = get_db()
+    query = "INSERT INTO student (name) VALUES (?)" 
+    db.execute(query, [name])
+    db.commit()
 
-# Add a new assignment for a given student
-def add_assignment(student_id, **kwargs):
+# Add a new score for an assignment for a given student, or updates it if
+# one already exists
+def add_or_update_score(student_id, **kwargs):
     # probably need kwargs or something with assignment info
     pass
-
-# Add a new assignment for a given student, or update an existing assignment
-# if the given assignment_name already exists in the database
-def update_assignment(student_id, assignment_name)
-    # assignments are keyed by string
-    pass
-
-# Remove an assignment from a given student
-def remove_assignment(student_id, assignment_name)
-    # assignments are keyed by string
-    pass
-
