@@ -4,7 +4,7 @@ import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 
-
+# Bunch of boilerplate copied from Flask tutorials
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(
@@ -39,3 +39,34 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
+# Database interaction
+
+# Return assignment information for a single student
+def get_student(student_id):
+    pass
+
+# Return assignment information for all students
+def get_students():
+    pass
+
+# Add a new student to the class
+def create_student(name):
+    pass
+
+# Add a new assignment for a given student
+def add_assignment(student_id, **kwargs):
+    # probably need kwargs or something with assignment info
+    pass
+
+# Add a new assignment for a given student, or update an existing assignment
+# if the given assignment_name already exists in the database
+def update_assignment(student_id, assignment_name)
+    # assignments are keyed by string
+    pass
+
+# Remove an assignment from a given student
+def remove_assignment(student_id, assignment_name)
+    # assignments are keyed by string
+    pass
+
