@@ -2,14 +2,13 @@
 {% block browser_title %} Home {% endblock %}
 {% block page_title %} Home {% endblock %}
 {% block content %}
-    <p>Welcome to the COMP 182 gradebook.</p>
-
+<p>Welcome to the COMP 182 gradebook.</p>
 <h3>View Student</h3>
-<form action = "{{ url_for('routes.student') }}" method="GET">
+<form action = "{{ url_for('routes.student') }}" method="POST">
     <p>{{ view_student_form.students }}</p>
     <p>{{ view_student_form.submit }}</p>
 </form>
-
+<div class="divider"></div>
 <h3>Add Student</h3>
 <h4>Current students</h4>
 {% if students %}
@@ -33,7 +32,7 @@
     <p>Name: {{ add_student_form.name }}</p>
     <p>{{ add_student_form.submit }}</p>
 </form>
-
+<div class="divider"></div>
 <h3>Add Assignment</h3>
 <h4>Current assignments</h4>
 {% if assignments %}

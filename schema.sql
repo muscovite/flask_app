@@ -17,7 +17,7 @@ CREATE TABLE assignment (
 CREATE TABLE grade (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   score REAL NOT NULL,
-  submitted DATE NOT NULL DEFAULT CURRENT_DATE,
+  submit_date DATE NOT NULL DEFAULT CURRENT_DATE,
   student_id INTEGER NOT NULL,
   assignment_id INTEGER NOT NULL,
   FOREIGN KEY (student_id) REFERENCES student (id),

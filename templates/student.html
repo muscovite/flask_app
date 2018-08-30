@@ -2,18 +2,43 @@
 {% block browser_title %} Student Information {% endblock %}
 {% block page_title %} Student Information {% endblock %}
 {% block content %}
-    <p>Grades for {{student.name}}</p>
-<h3>View Student</h3>
-<form action = "{{ url_for('routes.student') }}" method="GET">
-    <p>{{ view_student_form.students }}</p>
-    <p>{{ view_student_form.submit }}</p>
-</form>
+{% if name %}
+    <h3> Grades for {{ name }}</h3>
+{% else %}
+    <p>No student chosen or no grade information to show.</p>
+{% endif %}
+{% if grades %}
+    <p>Current class average: {{ average }}</p>
+    <table>
+        <tr>
+            <th>Score</th>
+            <th>Submit Date</th>
+            <th>Assignment</th>
+        </tr>
+        {% for row in grades %}
+            <tr>
+              <td>{{ row[0] }}</td>
+              <td>{{ row[1] }}</td>
+              <td>{{ row[2] }}</td>
+            </tr>
+        {% endfor %}    
+    </table>
+{% else %}
+    <p>No grade information to show.</p>
+{% endif %}
 <h3>Add Grade</h3>
-<form action="{{ url_for('routes.add_student') }}" method="POST">
-    {{ render_success("add_student") }}
-    {{ render_errors("add_student") }}
-    <p>Name: {{ add_student_form.name }}</p>
-    <p>{{ add_student_form.submit }}</p>
-</form>
+{% if assignments and name %}
+    <form action="{{ url_for('routes.add_grade') }}" method="POST">
+        {{ render_success("add_grade") }}
+        {{ render_errors("add_grade") }}
+        <p>Score: {{ add_grade_form.score }}</p>
+        <p>Submitted: {{ add_grade_form.submit_date }}</p>
+        <p>Assignment: {{ add_grade_form.assignments }}</p>
+        {{add_grade_form.student_id}}
+        <p>{{ add_grade_form.submit }}</p>
+    </form>
+{% else %}
+    <p>No created assignments or no student selected.</p>
+{% endif %}
 <a href="/">Back to home</a>
 {% endblock %}

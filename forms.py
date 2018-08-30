@@ -5,13 +5,14 @@
 from wtforms import (
     DecimalField,
     Form,
+    HiddenField,
     SelectField,
     StringField,
     SubmitField,
 )
 # This DateField requires HTML5 support. Use wtforms.DateField if your brower
 # is too outdated - it will stil provide date validation but the browser will
-# render it as a plain input box.
+# render it in the form as a simple text input field.
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired, NumberRange
 
@@ -38,8 +39,8 @@ class AddAssignmentForm(Form):
 class AddGradeForm(Form):
     score = DecimalField("score", validators=[InputRequired()])
     submit_date = DateField("submit_date", validators=[InputRequired()])
-    student_id = SelectField("student", validators=[InputRequired()], coerce=int)
-    assignment_id = SelectField(
+    student_id = HiddenField("student_id", validators=[InputRequired()])
+    assignments = SelectField(
         "assignment", validators=[InputRequired()], coerce=int
     )
     submit = SubmitField("Submit")

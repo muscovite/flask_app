@@ -12,8 +12,7 @@ from flask import (
 )
 
 from flask_app import db
-from flask_app.forms import AddStudentForm, AddAssignmentForm, ViewStudentForm
-from flask_app.util import date_to_unix
+from flask_app.forms import AddAssignmentForm, AddGradeForm, AddStudentForm, ViewStudentForm
 
 # Groups your routes into a blueprint so the app can register them from
 # another file. You can use multiple blueprints to keep your routes organized.
@@ -29,7 +28,7 @@ def reset_session():
 
 
 # The main page. You can add new assignments, students and grades from here.
-@routes.route("/")
+@routes.route("/", methods=["GET"])
 def index():
     add_assignment_form = AddAssignmentForm()
     add_student_form = AddStudentForm()
@@ -55,7 +54,7 @@ def index():
     )
 
 
-# Add a new assignment
+# Route that handles form submission. Add a new assignment
 @routes.route("/assignment/add", methods=["POST"])
 def add_assignment():
     assignment_form = AddAssignmentForm(request.form)
@@ -70,25 +69,12 @@ def add_assignment():
     return redirect(url_for("routes.index"))
 
 
-# Display summary of all assignments for this class
-@routes.route("/assignment/all")
-def assignments_all():
-    return "all assignments"
-
-
-# Display summary of all students and their current class averages
-@routes.route("/student/all/")
-def students_all():
-    return "all grades"
-
-
-# Add a new student
+# Route that handles form submission. Add a new student
 @routes.route("/student/add/", methods=["POST"])
 def add_student():
     student_form = AddStudentForm(request.form)
 
     if not student_form.validate():
-        print "student form error"
         session["error"] = {"add_student": student_form.errors}
         return redirect(url_for("routes.index"))
 
@@ -96,19 +82,90 @@ def add_student():
     session["success"] = {"add_student": "Added a new student!"}
     return redirect(url_for("routes.index"))
 
+# Helper function to construct direct url for a student's grade page
+def url_for_student(id):
+    return redirect(url_for("routes.student") + str(id))
 
+# Calculate a student's current class average
+def get_class_average(grades_and_weights):
+    total_weight = 0
+    average = 0
+
+    for grade in grades_and_weights:
+        average += grade[0] * grade[1]
+        total_weight += grade[1]
+
+    # The total weight of assignments might not add up to 1 yet, ex. we are
+    # only partway through the semester, or the student is late on submissions
+    # so we need to scale the average appropriately
+    return average / total_weight
 
 # Display detailed grade information for a single student
-@routes.route("/student/", methods=["GET"])
-def student():
-    id = request.args.get("students", None)
+# We handle POST so you can access this page after selecting a student from the
+# dropdown on the main page.
+# We handle GET so you can also directly link to a student's page, if you know
+# their ID.
+@routes.route("/student/", methods=["GET", "POST"])
+@routes.route("/student/<id>", methods=["GET"])
+def student(id=None):
+    if request.method == "POST":
+        id = request.form["students"]
 
     if not id:
-        return "You didn't pick a student"
+        return render_template(
+            "student.html"
+        )
 
-    student_data = db.get_student(id)
-    return "You picked student with id %d" % int(id)
+    add_grade_form = AddGradeForm()
 
-    # return render_template(
-    #     "student.html",
-    # )
+    student = db.get_student(id)
+    grades = db.get_student_grades(id)
+    assignments = db.get_assignments_choices()
+
+    # List comprehensions are a neat pythonic way of creating a new list based
+    # on another list or other iterable data structure. Here, we're using a
+    # list comprehension to extract only the grades and assignment weights from
+    # the list of student grades
+    grades_and_weights = [(grade[0], grade[3]) for grade in grades]
+    average = get_class_average(grades_and_weights)
+
+    add_grade_form.assignments.choices = assignments
+    add_grade_form.student_id.data = id
+
+    error = session.get("error", {})
+    success = session.get('success', {})
+    reset_session()
+
+    return render_template(
+        "student.html",
+        name=student[1],
+        average=average,
+        grades=grades,
+        assignments=assignments,
+        add_grade_form=add_grade_form,
+        error=error,
+        success=success
+    )
+
+# Route that handles form submission. Add a new grade for a given student
+@routes.route("/grade/add/", methods=["POST"])
+def add_grade():
+    id = request.form["student_id"]
+    grade_form = AddGradeForm(request.form)
+
+    # Unfortunately, since the assignments are dynamically generated, you need
+    # to provide them before form validation
+    assignments = db.get_assignments_choices()
+    grade_form.assignments.choices = assignments
+
+    if not grade_form.validate():
+        session["error"] = {"add_grade": grade_form.errors}
+        return url_for_student(id)
+
+    score = float(grade_form.score.data)
+    student_id = int(grade_form.student_id.data)
+
+    db.add_grade(score, grade_form.submit_date.data, student_id, grade_form.assignments.data)
+
+    session["success"] = {"add_grade": "Added a new grade!"}
+    return url_for_student(id)

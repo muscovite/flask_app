@@ -28,16 +28,14 @@
   <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>
-      {% block browser_title %}{% endblock %}- COMP 182 Algorithmic Thinking
+        {% block browser_title %}{% endblock %}- COMP 182 Algorithmic Thinking
     </title>
   </head>
   <body>
     <h1>{% block page_title %}{% endblock %}</h1>
     <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">
-      {% block footer %}
-      &copy; Copyright 2018 by <a href="http://domain.invalid/">you</a>.
-      {% endblock %}
+        &copy; Copyright 2018 by <a href="http://extrahop.com/">ExtraHop</a>.
     </div>
   </body>
 </html>

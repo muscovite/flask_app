@@ -1,7 +1,17 @@
+/* 
+ * If your browser isn't rendering newly added styles, you may have to do a
+ * hard page reload to force it to clear its cached CSS file 
+ * (CTRL + F5 on Chrome)
+ */
+
 .error {
     color: red;
 }
 
 .success {
     color: green;
+}
+
+.divider {
+    border: 1px solid grey;
 }

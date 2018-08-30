@@ -46,41 +46,75 @@ def init_app(app):
 
 # Database interaction
 
-# Return grade information for a single student
-def get_student(student_id):
+# Return a single student
+def get_student(id):
     db = get_db()
-    students = db.execute('SELECT * from student').fetchall()
-    return students
+    student = db.execute('SELECT * FROM student WHERE id = ?', [id]).fetchall()
+    return student[0]
 
 # Return all existing students
 def get_students():
     db = get_db()
-    students = db.execute('SELECT * from student').fetchall()
+    students = db.execute('SELECT * FROM student').fetchall()
     return students
+
+# Add a new student to the class
+def add_student(name):
+    db = get_db()
+    query = "INSERT INTO student (name) VALUES (?)"
+    db.execute(query, [name])
+    db.commit()
 
 # Return all existing assignments
 def get_assignments():
     db = get_db()
-    assignments = db.execute('SELECT * from assignment').fetchall()
+    assignments = db.execute('SELECT * FROM assignment').fetchall()
+    return assignments
+
+# Return all existing assignments to use as choices for adding grades
+def get_assignments_choices():
+    db = get_db()
+    assignments = db.execute('SELECT id, title FROM assignment').fetchall()
     return assignments
 
 # Add a new assignment
 def add_assignment(title, weight, due_date):
     db = get_db()
-    query = """INSERT INTO assignment (title, weight, due_date) 
+    query = """INSERT INTO assignment (title, weight, due_date)
                VALUES (?, ?, ?)"""
     db.execute(query, [title, weight, due_date])
     db.commit()
 
-# Add a new student to the class
-def add_student(name):
+# Return all grades for a given student
+def get_student_grades(student_id):
     db = get_db()
-    query = "INSERT INTO student (name) VALUES (?)" 
-    db.execute(query, [name])
+    query = """SELECT score, submit_date, title, weight FROM grade
+               JOIN assignment ON assignment.id = grade.assignment_id
+               WHERE grade.student_id = ?"""
+    grades = db.execute(query, [student_id]).fetchall()
+    return grades
+
+# Add a new score for an assignment for a given student, or update it if
+# one already exists
+# Note that there's probably a more complex single query that can handle
+# both existence checking and then update/insert in one go.
+# See if you can figure it out (:
+def add_grade(score, submit_date, student_id, assignment_id):
+    db = get_db()
+
+    # Check if a grade entry already exists for this student and assignment
+    # combination
+    query = "SELECT * FROM grade WHERE student_id = ? AND assignment_id = ?"
+    exists = db.execute(query, [student_id, assignment_id]).fetchone()
+
+    if exists:
+        query = """UPDATE grade SET score = ?, submit_date = ?
+                   WHERE student_id = ? AND assignment_id = ?"""
+    else:
+        query = """INSERT INTO grade
+                        (score, submit_date, student_id, assignment_id)
+                   VALUES (?, ?, ?, ?)"""
+
+    db.execute(query, [score, submit_date, student_id, assignment_id])
     db.commit()
 
-# Add a new score for an assignment for a given student, or updates it if
-# one already exists
-def add_or_update_score(student_id, **kwargs):
-    # probably need kwargs or something with assignment info
-    pass
