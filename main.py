@@ -11,22 +11,13 @@ def create_app():
 
     # If you want to use sessions, you need to set a secret key
     # This app uses session variables to pass around form validation messages
-    app.secret_key = 'super secure key'
-    db.init_app(app)
+    app.secret_key = "super secure key"
 
     # Register routes with your app
     app.register_blueprint(routes.routes)
 
-    # Tell app where the database instance should live
-    app.instance_path = './instance'
-    app.config.from_mapping(
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-    )
-
-    # Ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    # Load the database
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///./my_db.db"
+    db.init_db(app)
 
     return app

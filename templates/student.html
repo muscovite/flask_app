@@ -15,11 +15,11 @@
             <th>Submit Date</th>
             <th>Assignment</th>
         </tr>
-        {% for row in grades %}
+        {% for g in grades %}
             <tr>
-              <td>{{ row[0] }}</td>
-              <td>{{ row[1] }}</td>
-              <td>{{ row[2] }}</td>
+              <td>{{ g.score }}</td>
+              <td>{{ g.submit_date }}</td>
+              <td>{{ g.assignment.title }}</td>
             </tr>
         {% endfor %}    
     </table>

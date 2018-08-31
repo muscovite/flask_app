@@ -7,8 +7,10 @@ Make sure you have Python and [pip](https://pip.pypa.io/en/stable/installing/) i
 
 ### Linux
 Installing dependencies
-- Flask: `pip install flask`    
-- WTForms: `pip install wtforms` 
+- Flask (web framework): `pip install flask`
+- SQLAlchemy (database manager): `pip install SQLAlchemy`
+- Flask-SQLAlchemy: `pip install flask_sqlalchemy`
+- WTForms (form manager): `pip install wtforms` 
 
 Managing the app
 - Navigate to the folder that contains `main.py`
@@ -27,19 +29,19 @@ todo
 ### App structure
 - `main.py`: Flask entry point to the app. Performs some setup actions.
 - `routes.py`: Contains all the routes/endpoints used in the app
-- `db.py`: Contains methods for setting up and interacting with the database
+- `db.py`: Contains methods for setting up and interacting with the database and database models
 - `forms.py`: Defines the WTForms used in the app
-- `schema.sql`: Defines the database schema
 - `templates`: Jinja2 webpage templates
   -  `base.html`: Provides macros and basic structure common to all pages
   -  `index.html`: Template for the main overview page
   -  `student.html`: Template for student page
 - `static`: By convention, stores JS files, images and CSS files
   - `style.css`: CSS for the web app 
-- `instance`: The database lives here 
+- `my_db.db`: This is your sqlite database
 
 ## Documentation
 - [Flask](http://flask.pocoo.org/docs/1.0/)
+- [Flask-SQLAlchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
 - [WTForms](https://wtforms.readthedocs.io/en/stable/)
 - [sqlite3](https://docs.python.org/2.7/library/sqlite3.html)/ [SQLite](https://www.sqlite.org/docs.html) 
 - [Jinja2](http://jinja.pocoo.org/docs/2.10/)

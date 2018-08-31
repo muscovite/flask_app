@@ -10,6 +10,7 @@ from wtforms import (
     StringField,
     SubmitField,
 )
+
 # This DateField requires HTML5 support. Use wtforms.DateField if your brower
 # is too outdated - it will stil provide date validation but the browser will
 # render it in the form as a simple text input field.
@@ -19,19 +20,23 @@ from wtforms.validators import InputRequired, NumberRange
 
 class ViewStudentForm(Form):
     students = SelectField("name")
-    submit = SubmitField("Submit")  # optional?
+    submit = SubmitField("Submit")
+
 
 class AddStudentForm(Form):
     name = StringField("name", validators=[InputRequired()])
-    submit = SubmitField("Submit")  # optional?
+    submit = SubmitField("Submit")
 
 
 class AddAssignmentForm(Form):
     title = StringField("title", validators=[InputRequired()])
-    weight = DecimalField("weight", validators=[
-        InputRequired(), 
-        NumberRange(0, 1, "Assignment weight must be between 0 and 1.")
-        ])
+    weight = DecimalField(
+        "weight",
+        validators=[
+            InputRequired(),
+            NumberRange(0, 1, "Assignment weight must be between 0 and 1."),
+        ],
+    )
     due_date = DateField("due_date", validators=[InputRequired()])
     submit = SubmitField("Submit")
 

@@ -7,114 +7,108 @@ import time
 from datetime import datetime
 
 import click
-from flask import current_app, g
 from flask.cli import with_appcontext
+from flask_sqlalchemy import SQLAlchemy
 
-# Bunch of boilerplate copied from Flask tutorials
-def get_db():
-    if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
+db = SQLAlchemy()
 
-    return g.db
+#
+# Database models
+#
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text(), unique=True, nullable=False)
+    grades = db.relationship("Grade", backref="student", lazy=True)
 
-def close_db(e=None):
-    db = g.pop('db', None)
 
-    if db is not None:
-        db.close()
+class Assignment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.Text(), unique=True, nullable=False)
+    weight = db.Column(db.Float(), nullable=False)
+    due_date = db.Column(db.Date(), nullable=False)
+    grades = db.relationship("Grade", backref="assignment", lazy=True)
 
-def init_db():
-    db = get_db()
 
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+class Grade(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    score = db.Column(db.Float(), nullable=False)
+    submit_date = db.Column(db.Date(), nullable=False)
+    student_id = db.Column(
+        db.Integer, db.ForeignKey("student.id"), nullable=False
+    )
+    assignment_id = db.Column(
+        db.Integer, db.ForeignKey("assignment.id"), nullable=False
+    )
 
-@click.command('init-db')
-@with_appcontext
-def init_db_command():
-    """Clear the existing data and create new tables."""
-    init_db()
-    click.echo('Initialized the database.')
 
-def init_app(app):
-    app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
+#
+# Database initialization
+#
 
+
+def init_db(app):
+    # Flask lets you create a test context to initialize an app
+    with app.test_request_context():
+        db.init_app(app)
+        db.create_all()
+
+
+#
 # Database interaction
+#
 
 # Return a single student
+# SQL: SELECT * FROM student where id = <id>
 def get_student(id):
-    db = get_db()
-    student = db.execute('SELECT * FROM student WHERE id = ?', [id]).fetchall()
-    return student[0]
+    return Student.query.filter_by(id=id).first()
+
 
 # Return all existing students
+# SQL: SELECT * FROM student
 def get_students():
-    db = get_db()
-    students = db.execute('SELECT * FROM student').fetchall()
-    return students
+    return Student.query.all()
+
 
 # Add a new student to the class
+# SQL: INSERT INTO student (name) VALUES (<name>)
 def add_student(name):
-    db = get_db()
-    query = "INSERT INTO student (name) VALUES (?)"
-    db.execute(query, [name])
-    db.commit()
+    student = Student(name=name)
+    db.session.add(student)
+    db.session.commit()
+
 
 # Return all existing assignments
+# SQL: SELECT * FROM assignment
 def get_assignments():
-    db = get_db()
-    assignments = db.execute('SELECT * FROM assignment').fetchall()
-    return assignments
+    return Assignment.query.all()
 
-# Return all existing assignments to use as choices for adding grades
-def get_assignments_choices():
-    db = get_db()
-    assignments = db.execute('SELECT id, title FROM assignment').fetchall()
-    return assignments
 
 # Add a new assignment
+# SQL: INSERT INTO assignment (title, weight, due_date)
+#      VALUES (<title>, <weight>, <due_date>)
 def add_assignment(title, weight, due_date):
-    db = get_db()
-    query = """INSERT INTO assignment (title, weight, due_date)
-               VALUES (?, ?, ?)"""
-    db.execute(query, [title, weight, due_date])
-    db.commit()
+    assignment = Assignment(title=title, weight=weight, due_date=due_date)
+    db.session.add(assignment)
+    db.session.commit()
+
 
 # Return all grades for a given student
+# SQL: SELECT score, submit_date, title, weight FROM grade
+#      JOIN assignment ON assignment.id = grade.assignment_id
+#      WHERE grade.student_id = <student_id>
 def get_student_grades(student_id):
-    db = get_db()
-    query = """SELECT score, submit_date, title, weight FROM grade
-               JOIN assignment ON assignment.id = grade.assignment_id
-               WHERE grade.student_id = ?"""
-    grades = db.execute(query, [student_id]).fetchall()
-    return grades
+    return Student.query.filter_by(id=student_id).first().grades
 
-# Add a new score for an assignment for a given student, or update it if
-# one already exists
-# Note that there's probably a more complex single query that can handle
-# both existence checking and then update/insert in one go.
-# See if you can figure it out (:
+
+# Add a new score for an assignment for a given student
+# SQL: INSERT INTO grade (score, submit_date, student_id, assignment_id)
+#      VALUES (<score>, <submit_date>, <student_id>, <assignment_id>)
 def add_grade(score, submit_date, student_id, assignment_id):
-    db = get_db()
-
-    # Check if a grade entry already exists for this student and assignment
-    # combination
-    query = "SELECT * FROM grade WHERE student_id = ? AND assignment_id = ?"
-    exists = db.execute(query, [student_id, assignment_id]).fetchone()
-
-    if exists:
-        query = """UPDATE grade SET score = ?, submit_date = ?
-                   WHERE student_id = ? AND assignment_id = ?"""
-    else:
-        query = """INSERT INTO grade
-                        (score, submit_date, student_id, assignment_id)
-                   VALUES (?, ?, ?, ?)"""
-
-    db.execute(query, [score, submit_date, student_id, assignment_id])
-    db.commit()
-
+    grade = Grade(
+        score=score,
+        submit_date=submit_date,
+        student_id=student_id,
+        assignment_id=assignment_id,
+    )
+    db.session.add(grade)
+    db.session.commit()

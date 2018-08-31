@@ -17,10 +17,10 @@
         <th>ID</th>
         <th>Name</th>
     </tr>
-    {% for row in students %}
+    {% for s in students %}
         <tr>
-          <td>{{ row[0] }}</td>
-          <td>{{ row[1] }}</td>
+          <td>{{ s.id }}</td>
+          <td>{{ s.name }}</td>
         </tr>
     {% endfor %}    
 </table>
@@ -42,11 +42,11 @@
         <th>Weight</th>
         <th>Due Date</th>
     </tr>
-    {% for row in assignments %}
+    {% for a in assignments %}
         <tr>
-          <td>{{ row[1] }}</td>
-          <td>{{ row[2] }}</td>
-          <td>{{ row[3] }}</td>
+          <td>{{ a.title }}</td>
+          <td>{{ a.weight }}</td>
+          <td>{{ a.due_date }}</td>
         </tr>
     {% endfor %}    
 </table>
