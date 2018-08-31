@@ -138,6 +138,10 @@ def student(id=None):
     add_grade_form = AddGradeForm()
 
     student = db.get_student(id)
+
+    if not student:
+        return render_template("student.html")
+
     grades = db.get_student_grades(id)
     assignments = _get_assignments_choices()
 

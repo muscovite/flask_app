@@ -30,6 +30,10 @@ class Assignment(db.Model):
 
 
 class Grade(db.Model):
+    # There shouldn't be more than one grade entry for a given
+    # student-assignment pairing
+    __table_args__ = (db.UniqueConstraint('student_id', 'assignment_id'), {})
+
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Float(), nullable=False)
     submit_date = db.Column(db.Date(), nullable=False)
@@ -104,6 +108,8 @@ def get_student_grades(student_id):
 # SQL: INSERT INTO grade (score, submit_date, student_id, assignment_id)
 #      VALUES (<score>, <submit_date>, <student_id>, <assignment_id>)
 def add_grade(score, submit_date, student_id, assignment_id):
+    # Note that there is no error checking for whether a score already exists
+    # for the given student-assignment pair
     grade = Grade(
         score=score,
         submit_date=submit_date,
