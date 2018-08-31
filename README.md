@@ -8,8 +8,8 @@ Make sure you have Python and [pip](https://pip.pypa.io/en/stable/installing/) i
 ### Linux
 Installing dependencies
 - Flask (web framework): `pip install flask`
-- SQLAlchemy (database manager): `pip install SQLAlchemy`
-- Flask-SQLAlchemy: `pip install flask_sqlalchemy`
+- SQLAlchemy (ORM): `pip install SQLAlchemy`
+- Flask-SQLAlchemy (Flask bindings to SQLAlchemy): `pip install flask_sqlalchemy`
 - WTForms (form manager): `pip install wtforms` 
 
 Managing the app
