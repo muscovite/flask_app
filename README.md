@@ -16,9 +16,7 @@ Managing the app
 - Navigate to the folder that contains `main.py`
 - Set environment variables for current shell session: `export FLASK_APP=main.py FLASK_DEBUG=1`
   - Alternatively, you can also prefix `FLASK_APP=main.py FLASK_DEBUG=1` to the following commands
-- Initialize database: `flask init-db`
-  - Run this command to update your database after making changes to `schema.sql`. This clears data stored in the existing database.
-- Run app: `flask init-db`
+- Run app: `flask run`
 
 Configurable options
 - Run Flask app on a different port: `flask run --port 1234` (default is 5000)
