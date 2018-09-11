@@ -17,7 +17,7 @@ db = SQLAlchemy()
 #
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text(), unique=True, nullable=False)
+    name = db.Column(db.Text(), nullable=False)
     grades = db.relationship("Grade", backref="student", lazy=True)
 
 
