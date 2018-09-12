@@ -3,28 +3,24 @@
 This is a basic web app that manages students and grades for a single class.
 
 ## Setup
-Make sure you have Python and [pip](https://pip.pypa.io/en/stable/installing/) installed. Note that this app was built on Python 2.7, so some of the steps here may vary if you're using a different version.
+Make sure you have Python and [pip](https://pip.pypa.io/en/stable/installing/) installed. Note that this app was built on Python 2.7, so some of the steps here may vary if you're using a different version. These steps were tested on Ubuntu 16.04 and macOS High Sierra.
 
-### Linux
-Installing dependencies
+### Installing dependencies
 - Flask (web framework): `pip install flask`
 - SQLAlchemy (ORM): `pip install SQLAlchemy`
 - Flask-SQLAlchemy (Flask bindings to SQLAlchemy): `pip install flask_sqlalchemy`
 - WTForms (form manager): `pip install wtforms` 
 
-Managing the app
+### Managing the app
 - Navigate to the folder that contains `main.py`
 - Set environment variables for current shell session: `export FLASK_APP=main.py FLASK_DEBUG=1`
   - Alternatively, you can also prefix `FLASK_APP=main.py FLASK_DEBUG=1` to the following commands
 - Run app: `flask run`
 
-Configurable options
+### Configurable options
 - Run Flask app on a different port: `flask run --port 1234` (default is 5000)
 
-### OSX
-todo
-
-### App structure
+## App structure
 - `main.py`: Flask entry point to the app. Performs some setup actions.
 - `routes.py`: Contains all the routes/endpoints used in the app
 - `db.py`: Contains methods for setting up and interacting with the database and database models
